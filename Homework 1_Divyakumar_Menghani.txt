@@ -1,0 +1,134 @@
+Data Mining 290
+
+Homework 1 - Obtain data - February 3 2014
+
+Divyakumar Menghani
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+Dataset - movies.csv
+----------------------------------------------------------------------------------------------------------------------------------------------------
+Source - http://vincentarelbundock.github.io/Rdatasets/datasets.html
+Column description - http://vincentarelbundock.github.io/Rdatasets/doc/ggplot2/movies.html
+
+Movies were selected for inclusion if they had a known length and had been rated by at least one imdb user. The data set contains the following fields:
+title. Title of the movie.
+year. Year of release.
+budget. Total budget (if known) in US dollars
+length. Length in minutes.
+rating. Average IMDB user rating.
+votes. Number of IMDB users who rated this movie.
+r1-10. Multiplying by ten gives percentile (to nearest 10%) of users who rated this movie a 1.
+mpaa. MPAA rating.
+action, animation, comedy, drama, documentary, romance, short. Binary variables representing if movie was classified as belonging to that genre.
+
+Sample data in the file
+
+## First 10 records in the file
+
+harbinger:~$ head -n 10 movies.csv
+row,year,length,budget,rating,votes,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,mpaa,Action,Animation,Comedy,Drama,Documentary,Romance,Short,title
+1,1971,121,NA,6.4,348,4.5,4.5,4.5,4.5,14.5,24.5,24.5,14.5,4.5,4.5,,0,0,1,1,0,0,0,$
+2,1939,71,NA,6,20,0,14.5,4.5,24.5,14.5,14.5,14.5,4.5,4.5,14.5,,0,0,1,0,0,0,0,$1000 a Touchdown
+3,1941,7,NA,8.2,5,0,0,0,0,0,24.5,0,44.5,24.5,24.5,,0,1,0,0,0,0,1,$21 a Day Once a Month
+4,1996,70,NA,8.2,6,14.5,0,0,0,0,0,0,0,34.5,45.5,,0,0,1,0,0,0,0,"$40,000 "
+5,1975,71,NA,3.4,17,24.5,4.5,0,14.5,14.5,4.5,0,0,0,24.5,,0,0,0,0,0,0,0,"$50,000 Climax Show, The"
+6,2000,91,NA,4.3,45,4.5,4.5,4.5,14.5,14.5,14.5,4.5,4.5,14.5,14.5,,0,0,0,1,0,0,0,$pent
+7,2002,93,NA,5.3,200,4.5,0,4.5,4.5,24.5,24.5,14.5,4.5,4.5,14.5,R,1,0,0,1,0,0,0,$windle
+8,2002,25,NA,6.7,24,4.5,4.5,4.5,4.5,4.5,14.5,14.5,14.5,4.5,14.5,,0,0,0,0,1,0,1,'15'
+9,1987,97,NA,6.6,18,4.5,4.5,4.5,0,0,0,34.5,14.5,4.5,24.5,,0,0,0,1,0,0,0,'38
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+Questions:
+----------------------------------------------------------------------------------------------------------------------------------------------------
+1. Type of data:
+
+Data is in structured CSV format. It has the above mentioned columns. Some attributes are categorical and some are quantitative.
+
+2. Number of records:
+
+There are 58788 records(excluding 1 header row) containing movie names from "$" to "xXx: State of the Union".
+
+Code:
+harbinger:~$ wc movies.csv
+  58789  171126 5735378 movies.csv
+
+
+3 Interesting record:
+
+I found three movies with an IMDB rating of 10. But I had not really heard about these movies ever. Upon looking more at the data, I found only 5 voters had voted for these movies. I learned that just rating is not a true metric to be considered. We should also factor in the number of votes.
+It is similar to the way you look at Yelp ratings, not just the average rating but also the number of reviews.
+
+harbinger:~$ cat movies.csv | cut -d ',' -f5,25 |sort | head -n 3
+10,Dimensia Minds Trilogy: The Hope Factor
+10,Fishing for Love
+10,"Summer Sonata
+
+4. Three questions that one can answer from this dataset:
+
+    1. Which movies have the word "California" in it?
+
+            harbinger:~$ cat movies.csv | cut -d ',' -f2 | grep "California"
+            "Adventures in Wild California"
+            "California"
+            "California"
+            "California"
+            "California"
+            "California Casanova"
+            "California Conquest"
+            "California Dreaming"
+            "California Heat"
+            "California Hot Wax"
+            "California Mail"
+            "California Passage"
+            "California Reich
+            "California Split"
+            "California Straight Ahead!"
+            "California Suite"
+            "California Sunshine"
+            "California Taboo"
+            "Dans les coulisses du clip 'California'"
+            "Hot Club California"
+            "In Old California"
+            "Out California Way"
+            "Raiders of Old California"
+            "Under California Stars"
+
+            harbinger:~$ cat movies.csv | cut -d ',' -f2 | grep "California" | wc
+                 24      58     512
+
+    2. What is the earliest release year for a movie in the dataset and what is the movie name?
+            harbinger:~$ cat movies.csv | cut -d ',' -f2,25 | sort | head -n 1
+            1893,Blacksmith Scene
+
+    3. Number of action movies in the dataset
+            harbinger:~$ cat movies.csv | cut -d ',' -f19 |grep "1" |wc
+               4152    4152    9457
+
+    4. Count of movies by year
+            harbinger:~$ awk -F, '{a[$2]++;}END{for (i in a)print i, a[i];}' movies.csv | sort
+            1893 1
+            1894 9
+            1895 3
+            1896 13
+            1897 9
+            1898 5
+            1899 9
+            1900 16
+            1901 28
+            1902 9
+            1903 37
+            1904 42
+            1905 17
+            1906 17
+            1907 12
+            ...
+            1996 1390
+            1997 1568
+            1998 1705
+            1999 1927
+            2000 2048
+            2001 2121
+            2002 2168
+            2003 2158
+            2004 1945
+            2005 349
