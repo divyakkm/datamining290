@@ -1,0 +1,64 @@
+Answers are:
+err_6 = -0.113461
+err_5 = -0.001133
+err_4 = -0.001396
+err_3 = -0.004461
+w_56 = 0.372992
+w_46 = 0.6796
+w_36 = -0.629513
+err_2 = 0.010601
+err_1 = 0
+w_25 = 0.477340
+w_24 = -3.0279
+w_23 = 1.9107
+w_15 = 3.98867
+w_14 = 1.986038
+w_13 = -3.04461
+
+Below are the calculations
+
+Expected Output is 0
+l = 10 # learn rate
+
+For node 6,
+t6 = 0
+o6 = 0.8387
+err6 = o6*(1-o6)*(t6-o6) = -0.113461
+
+For node 5,
+o5 = 0.9933
+w56 = 1.5
+err5 = o5*(1-o5)*(err6*w56) = -0.001133
+Adjusted w56 = w56 + l*err6*o5 = 0.372992
+
+For node 4,
+o4 = 0.0179
+w46 = 0.7
+err4 = o4*(1-o4)*(err4*w46) = -0.001396
+Adjusted w46 = w46 + l*err6*o4 = 0.6796
+
+For node 3,
+o3 = 0.7311
+w36 = 0.2
+err3 = o3*(1-o3)*(err3*w36) = -0.004461
+Adjusted w36 = w36 + l*err6*o3 = -0.629513
+
+For node 2,
+o2 = 2
+w_25 = 0.5
+w_24 = -3
+w_23 = 2
+err2 = o2*(1-o2)*(err3*w23 + err4*w24 + err5*w25) = 0.010601
+Adjusted w25 = w25 + l*err3*o2 = 0.477340
+Adjusted w24 = w24 + l*err4*o2 = -3.0279
+Adjusted w23 = w23 + l*err5*o2 = 1.9107
+
+For node 1,
+o1 = 1
+w_15 = 4
+w_14 = 2
+w_13 = -3
+err1 = o1*(1-o1)*(err3*w13 + err4*w14 + err5*w15) = 0
+Adjusted w15 = w15 + l*err3*o1 = 3.98867
+Adjusted w14 = w14 + l*err4*o1 = 1.986038
+Adjusted w13 = w13 + l*err5*o1 = -3.04461
