@@ -164,118 +164,117 @@ class: left, top, inverse
 
 ---
 
-# Final Project
+# Amazon Web Services
 
 ---
 
-## Deliverables
+## Grant
 
-  + Project Proposal (due April 9)
-  + Code (due April 30)
-  + Data (URL or sampled, due April 30)
-  + Presentation (May 8)
-  + Written Report (due May 14)
-
----
-
-## Groups
-
-  + 1-3 people
-
----
-
-## Proposal
-
-  + Informal, not graded
-  + A plan for your project
-  + After the proposal you should just be executing, not brainstorming
-  + Discussions before proposal encouraged
-
----
-
-## Report
-
-  + Introduction
-    + problem, insights, solutions
-  + Problem
-    + motivation, data set
-  + Solution
-    + techniques, failures, examples
-  + Details
-    + parameter tuning, software engineering challenges
-  + Related work
-    + including resources you used
-  + Further work
-    + any remaining ideas you have
+  + $5,600 for this class
+  + Store data in S3
+  + Use mrjob on EMR
 
 ???
 
-## Notes
+## No crazy
 
-  + Length
-    + around 2 pages, but more important to hit these points
-  + Introduction
-    + "gosh, if these insights are true, it would be really
-    exciting"
-  + Problem
-    + include problems with your data set
-  + Solution
-    + if you do clustering, give examples of a cluster you found and
-    individual data points that it contains
-  + Details
-    + what commands did you use for particular libraries. Can someone
-    duplicate your work?
-  + Formats
-    + PDF, Google Doc
+  + Overcharges go on my credit card!
+  + Ask me before doing anything not discussed here
 
 ---
 
-## Research Paper
+## S3
 
-  + [How to write a good research paper](http://research.microsoft.com/en-us/um/people/simonpj/papers/giving-a-talk/writing-a-paper-slides.pdf)
-  + But much shorter!
+  + [S3](http://aws.amazon.com/s3/): Simple Storage Service
+  + Can store and share large data files
+  + Free bandwidth when processing with EMR
+
+---
+
+## ```s3cmd```
+
+  + Upload / Download files
+  + ```s3cmd --configure```
+    + ```cat ~jretz/mrjob.conf``` to get answers to first two questions, defaults should work for the rest
+  + ```s3cmd mb s3://i290-name``` ← your name or team name here
+  + ```s3cmd put localfile s3://i290-name/data/```
 
 ???
 
-## Skip sections
+## Configuration
 
-  + No abstract
-  + Think paragraphs instead of pages
-
----
-
-## Presentation
-
-  + ~10 minutes
-  + Think: 1 slide per paragraph
-  + Focus on images, stories, examples
-  + Motivate people to read your paper, don't read it to them
+  + check ```~jretz/mrjob.conf```
 
 ---
 
-## Code
+## Elastic MapReduce
 
-  + Another GitHub repository
-  + Public is best, but if private then add Shreyas and me
-  + Include README with info on how to run algorithms
-  + Suggestion: include your paper
+  + ```python job.py -r emr -c ~jretz/mrjob.conf s3://i290-name/data/file```
+  + ```-r emr``` : run on EMR instead of localhost
+  + ```-c ~jretz/mrjob.conf``` : use a configuration file
+    + 5 machines, can change with command line options
+
+---
+
+## Copying Keys
+
+  + SSH keys are used to connect to server to check status
+  + Copy my keys, set correct permissions
+```bash
+$ cp ~jretz/i290T-03.pem.shared ~/i290T-03.pem
+$ chmod 0600 ~/i290T-03.pem
+```
+
+---
+
+.tight-code[
+```bash
+$ s3cmd put yelp_academic_dataset.json.gz s3://i290-jretz/data/
+# yelp_academic_dataset.json.gz -> s3://i290-jretz/data/yelp_academic_dataset.json.gz  [1 of 1]
+# 127506871 of 127506871   100% in    8s    13.60 MB/s  done
+
+$ cd datamining290/code/
+~/datamining290/code$ python unique_review.py -v -r emr \
+  -c ~jretz/mrjob.conf \
+  --output-dir s3://i290-jretz/output/unique_review/ \
+  --no-output \
+  s3://i290-jretz/data/yelp_academic_dataset.json.gz
+# ...
+# Creating Elastic MapReduce job flow
+# ...
+# Job flow created with ID: j-EFG48CIR1APW
+# ...
+# Job launched 60.8s ago, status STARTING: Provisioning Amazon EC2 capacity
+# ...
+# Job launched 334.4s ago, status RUNNING: Running step (unique_review.jretz.20130406.171258.267523: Step 1 of 3)
+# ...
+# map 73% reduce  42%
+# ...
+# Counters from step 1:
+# ...
+
+~/datamining290/code$ s3cmd ls -r s3://i290-jretz/output/
+# ...
+# 2013-04-06 18:05        29   s3://i290-jretz/output/unique_review/part-00005
+# ...
+```
+]
 
 ???
 
-## Reproducible
+## Trade-offs
 
-  + Imagine if someone wanted to reproduce your results
-  + Also great for portfolio (with Paper)
+  + Jobs may take 5 minutes to spin up
+  + Errors are harder to debug because they are mixed in with Hadoop and EMR
+    errors
 
 ---
 
-## Data
+## Extra Notes
 
-  + If large, just point to URL in paper and README
-    + git is not very good at handling large data files, don't commit large
-      datasets
-  + If very large, talk with me about hosting on Amazon Web Services
-  + We'll have computing resources available from Amazon
+  + Cannot overwrite output directory: choose a new one for each run
+  + Errors may be hard to debug. Run locally with a sample of your data
+  + Output from job will be split into files, recall the Hadoop video lecture
 
     </textarea>
     <script src="production/remark-0.5.9.min.js" type="text/javascript">
