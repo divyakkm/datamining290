@@ -15,7 +15,7 @@ w_15 = 3.98867
 w_14 = 1.986038
 w_13 = -3.04461
 
-Below are the calculations
+Below are the calculations:
 
 Expected Output is 0
 l = 10 # learn rate
@@ -62,3 +62,4 @@ err1 = o1*(1-o1)*(err3*w13 + err4*w14 + err5*w15) = 0
 Adjusted w15 = w15 + l*err3*o1 = 3.98867
 Adjusted w14 = w14 + l*err4*o1 = 1.986038
 Adjusted w13 = w13 + l*err5*o1 = -3.04461
+
