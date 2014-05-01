@@ -1,0 +1,380 @@
+<html>
+  <head>
+     <title>Number of Flight Delays in Dec 2008</title>
+  </head>
+  <body>
+<i>The below graph shows delayed flights for each airport in the month of Dec 2008.
+<br>
+<b><pre>                                                                                                                                                                                  <u>Number of Flight Delays in Dec 2008</b></u></pre>
+<pre><i>                                                                                                                                                                             Count of flights delayed by more than 15mins
+    <div id="chart"></div>
+    <script src="http://d3js.org/d3.v2.min.js"></script>
+    <script>
+function drawBarChart() {
+var data = d3.csv.parse(d3.select('#csv').text());
+var valueLabelWidth = 50; // space reserved for value labels (right)
+var barHeight = 18; // height of one bar
+var barLabelWidth = 150; // space reserved for bar labels
+var barLabelPadding = 15; // padding between bar and bar labels (left)
+var gridLabelHeight = 18; // space reserved for gridline labels
+var gridChartOffset = 3; // space between start of grid and first bar
+var maxBarWidth = 1000; // width of the bar with the max value
+
+// helper functions
+var barLabel = function(d) { return d['Dest']+","+d['Airport']; };
+var barValue = function(d) { return parseFloat(d['DepDelay_Len']); };
+var barText = function(d) { return parseFloat(d['DepDelay_Mean']); };
+
+// sorting
+var sortedData = data.sort(function(a, b) {
+ return d3.descending(barValue(a), barValue(b));
+});
+
+// scales
+var yScale = d3.scale.ordinal().domain(d3.range(0, sortedData.length)).rangeBands([0, sortedData.length * barHeight]);
+var y = function(d, i) { return yScale(i); };
+var yText = function(d, i) { return y(d, i) + yScale.rangeBand() / 2; };
+var x = d3.scale.linear().domain([0, d3.max(sortedData, barValue)]).range([0, maxBarWidth]);
+// svg container element
+var chart = d3.select('#chart').append("svg")
+  .attr('width', maxBarWidth + barLabelWidth + valueLabelWidth)
+  .attr('height', gridLabelHeight + gridChartOffset + sortedData.length * barHeight);
+// grid line labels
+var gridContainer = chart.append('g')
+  .attr('transform', 'translate(' + barLabelWidth + ',' + gridLabelHeight + ')');
+gridContainer.selectAll("text").data(x.ticks(10)).enter().append("text")
+  .attr("x", x)
+  .attr("dy", -3)
+  .attr("text-anchor", "middle")
+  .text(String);
+// vertical grid lines
+gridContainer.selectAll("line").data(x.ticks(10)).enter().append("line")
+  .attr("x1", x)
+  .attr("x2", x)
+  .attr("y1", 0)
+  .attr("y2", yScale.rangeExtent()[1] + gridChartOffset)
+  .style("stroke", "#ccc");
+// bar labels
+var labelsContainer = chart.append('g')
+  .attr('transform', 'translate(' + (barLabelWidth - barLabelPadding) + ',' + (gridLabelHeight + gridChartOffset) + ')');
+labelsContainer.selectAll('text').data(sortedData).enter().append('text')
+  .attr('y', yText)
+  .attr('stroke', 'none')
+  .attr('fill', 'black')
+  .attr("dy", ".35em") // vertical-align: middle
+  .attr('text-anchor', 'end')
+  .text(barLabel);
+// bars
+var barsContainer = chart.append('g')
+  .attr('transform', 'translate(' + barLabelWidth + ',' + (gridLabelHeight + gridChartOffset) + ')');
+barsContainer.selectAll("rect").data(sortedData).enter().append("rect")
+  .attr('y', y)
+  .attr('height', yScale.rangeBand())
+  .attr('width', function(d) { return x(barValue(d)); })
+  .attr('stroke', 'white')
+  .attr('fill', 'steelblue');
+// bar value labels
+barsContainer.selectAll("text").data(sortedData).enter().append("text")
+  .attr("x", function(d) { return x(barValue(d)); })
+  .attr("y", yText)
+  .attr("dx", 5) // padding-left
+  .attr("dy", ".35em") // vertical-align: middle
+  .attr("text-anchor", "start") // text-align: right
+  .attr("fill", "black")
+  .style("font-size","12px")
+  .attr("stroke", "none")
+  .text(function(d) { return d3.round(barValue(d), 2); });
+// start line
+barsContainer.append("line")
+  .attr("y1", -gridChartOffset)
+  .attr("y2", yScale.rangeExtent()[1] + gridChartOffset)
+  .style("stroke", "#000");
+
+}
+    </script>
+    <script id="csv" type="text/csv">Dest,DepDelay_Mean,DepDelay_Len,Airport
+MQT,59.71621622,74,Marquette
+PMD,39.27272727,11,Palmdale
+EWR,37.11777868,9832,Newark
+SIT,35.36708861,79,Sitka
+CMI,35.01265823,158,Champaign/Urbana
+GUC,34.16190476,105,Gunnison
+SPI,34.12941176,85,Springfield
+PSG,33.76785714,56,Petersburg
+AVP,32.34715026,193,Wilkes-Barre/Scranton
+OTH,32.22881356,118,North Bend
+CWA,31.23744292,219,Mosinee
+TEX,30.95454545,22,Telluride
+CIC,30.76146789,109,Chico
+PIR,29.5,2,Pierre
+JAC,29.31950207,241,Jackson
+LNK,27.88181818,220,Lincoln
+MOD,27.31623932,117,Modesto
+TVC,26.85128205,195,Traverse City
+EYW,26.54761905,84,Key West
+DAB,26.24031008,129,Daytona Beach
+ASE,26.0802005,399,Aspen
+SUN,25.57368421,190,Hailey
+ATW,25.54455446,404,Appleton
+LAN,25.48756219,201,Lansing
+DBQ,25.42857143,77,Dubuque
+ORD,25.39580785,24522,Chicago
+CDV,25.33333333,54,Cordova
+RDD,25.33043478,115,Redding
+RST,25.265,200,Rochester
+HDN,24.89795918,196,Hayden
+EGE,24.73263889,288,Eagle
+GRB,24.43777778,450,Green Bay
+LMT,23.61206897,116,Klamath Falls
+ADQ,23.34782609,46,Kodiak
+TOL,23.34567901,81,Toledo
+BQN,23.3245614,114,Aguadilla
+MDW,23.13836972,6367,Chicago
+SFO,22.88564589,10861,San Francisco
+FNT,22.85953177,598,Flint
+YAK,22.60377358,53,Yakutat
+MKE,22.40038314,3132,Milwaukee
+PIA,22.30188679,371,Peoria
+ROC,22.23348018,908,Rochester
+LSE,22.18965517,116,La Crosse
+MFR,22.16756757,370,Medford
+KTN,21.9408284,169,Ketchikan
+RNO,21.92437992,1653,Reno
+LIT,21.8352,1250,Little Rock
+GRR,21.76616121,1253,Grand Rapids
+CAE,21.75764994,817,Columbia
+SYR,21.75682705,769,Syracuse
+PHL,21.6516811,7852,Philadelphia
+JNU,21.62589928,278,Juneau
+SMF,21.49523052,3774,Sacramento
+SBN,21.42673522,389,South Bend
+XNA,21.40315107,1079,Fayetteville/Springdale/Rogers
+RHI,21.34782609,23,Rhinelander
+FWA,21.30263158,456,Fort Wayne
+BOI,21.13819876,1288,Boise
+ANC,21.07924837,1224,Anchorage
+JFK,21.0681292,9071,New York
+MEI,20.92727273,55,Meridian
+WRG,20.87755102,49,Wrangell
+ELM,20.85964912,114,Elmira
+SCE,20.77586207,58,NA
+BRW,20.6779661,59,Barrow
+GEG,20.61761859,1033,Spokane
+CID,20.58701299,770,Cedar Rapids
+MTJ,20.5828877,187,Montrose
+MHT,20.53627524,1337,Manchester
+GTR,20.52631579,76,Columbus-Starkville-West Point
+OKC,20.35121951,1845,Oklahoma City
+AZO,20.18367347,196,Kalamazoo
+CMH,20.17208938,2551,Columbus
+LGB,20.10679612,1236,Long Beach
+SJU,20.07520092,1742,San Juan
+OAK,20.012529,4310,Oakland
+SEA,19.8834927,7948,Seattle
+OMA,19.8637009,2113,Omaha
+FAR,19.68553459,318,Fargo
+SGF,19.65642458,716,Springfield
+MLB,19.43558282,163,Melbourne
+DSM,19.36671803,1298,Des Moines
+ALB,19.35414424,929,Albany
+MBS,19.34841629,221,Saginaw
+ACV,19.12543554,287,Arcata/Eureka
+HRL,19.12352941,340,Harlingen
+BZN,19.11578947,380,Bozeman
+PVD,19.1067513,1733,Providence
+VPS,19.09381238,501,Valparaiso
+BTV,18.94695481,509,Burlington
+BUF,18.82656095,2018,Buffalo
+RDM,18.81007752,258,Redmond
+TUL,18.75736096,1834,Tulsa
+ABQ,18.62253968,3150,Albuquerque
+STX,18.6,35,Christiansted
+LGA,18.49098341,8318,New York
+BRO,18.48672566,113,Brownsville
+MLI,18.47690015,671,Moline
+SDF,18.44242804,1598,Louisville
+PDX,18.42772371,4213,Portland
+BMI,18.30487805,328,Bloomington
+HPN,18.27045455,880,White Plains
+MCI,18.21569087,4270,Kansas City
+LAS,18.21100339,12687,Las Vegas
+FSD,18.21064302,451,Sioux Falls
+CAK,18.19783198,738,Akron
+MSN,18.14985862,1061,Madison
+ORF,18.06329114,1185,Norfolk
+FAY,18.03587444,223,Fayetteville
+STT,17.9351145,262,Charlotte Amalie
+FLL,17.92965712,5658,Ft. Lauderdale
+AUS,17.9109933,3584,Austin
+PBI,17.71315372,2524,West Palm Beach
+ONT,17.70318352,2136,Ontario
+MSP,17.69442096,9464,Minneapolis
+BHM,17.67118093,1846,Birmingham
+BNA,17.65273743,4475,Nashville
+HOU,17.64811859,4385,Houston
+CHS,17.62941738,1047,Charleston
+MLU,17.62941176,170,Monroe
+STL,17.62240136,4714,St Louis
+SAN,17.58432511,6890,San Diego
+LEX,17.51035323,821,Lexington
+MAF,17.45064378,466,Midland
+IDA,17.44318182,264,Idaho Falls
+ELP,17.36321031,1707,El Paso
+SWF,17.33898305,177,Newburgh
+CHA,17.33161954,389,Chattanooga
+RDU,17.28815415,4567,Raleigh
+SAT,17.23255132,3410,San Antonio
+IAD,17.21599718,5676,Chantilly
+FAI,17.16612378,307,Fairbanks
+BUR,17.1365564,2358,Burbank
+PSC,17.13559322,177,Pasco
+CEC,17.04878049,82,Crescent City
+AMA,17.00693241,577,Amarillo
+PIT,16.86112893,3118,Pittsburgh
+IAH,16.78011863,14667,Houston
+AEX,16.7672956,159,Alexandria
+GSO,16.71149897,974,Greensboro
+GCC,16.70175439,114,Gillette
+ISP,16.67584481,799,Islip
+GFK,16.67326733,101,Grand Forks
+RIC,16.66622517,1510,Richmond
+PFN,16.65124555,281,Panama City
+CLE,16.64564889,4631,Cleveland
+TUS,16.62715517,1856,Tucson
+SJC,16.60028585,4198,San Jose
+LYH,16.53061224,49,Lynchburg
+BOS,16.51852285,8557,Boston
+BQK,16.28169014,71,Brunswick
+SRQ,16.27628866,485,Sarasota
+COS,16.26862925,1087,Colorado Springs
+DEN,16.09788264,19411,Denver
+BTM,16.01785714,56,Butte
+DAL,15.87264379,4138,Dallas
+EUG,15.84107579,409,Eugene
+LAX,15.73325759,15843,Los Angeles
+BGR,15.69266055,218,Bangor
+SLC,15.67018172,10621,Salt Lake City
+TPA,15.65618013,6262,Tampa
+DHN,15.625,112,Dothan
+TYS,15.5887372,1172,Knoxville
+SAV,15.57191011,890,Savannah
+LBB,15.545,600,Lubbock
+BDL,15.53170029,2082,Windsor Locks
+FAT,15.4980315,1016,Fresno
+ERI,15.48453608,97,Erie
+FCA,15.43396226,159,Kalispell
+IND,15.34792404,3107,Indianapolis
+ABE,15.32216495,388,Allentown
+MCO,15.27899687,10527,Orlando
+ICT,15.24467099,1079,Wichita
+MIA,15.24313577,5281,Miami
+DAY,15.12590799,1239,Dayton
+JAX,15.12490024,2506,Jacksonville
+BIS,15.09022556,133,Bismarck
+HSV,15.05696203,790,Huntsville
+EVV,15.05080831,433,Evansville
+DTW,14.97027299,11942,Detroit
+ATL,14.9653174,33129,Atlanta
+CSG,14.96491228,114,Columbus
+AVL,14.92676056,355,Asheville
+MSY,14.7730179,3128,New Orleans
+TWF,14.66101695,118,Twin Falls
+MOB,14.63820225,445,Mobile
+BWI,14.60984661,8084,Baltimore
+SHV,14.48820327,551,Shreveport
+GSP,14.44529262,786,Greer
+RSW,14.42677824,2629,Ft. Myers
+RKS,14.41428571,140,Rock Springs
+AGS,14.3627907,215,Augusta
+CVG,14.33730916,6288,Covington
+OAJ,14.27731092,119,Jacksonville
+ABY,14.21794872,78,Albany
+JAN,14.17817818,999,Jackson
+ALO,14.11764706,17,Waterloo
+MSO,14.1147541,244,Missoula
+PWM,14.02105263,380,Portland
+BGM,14,54,Binghamton
+MDT,13.96494157,599,Harrisburg
+TXK,13.94318182,88,Texarkana
+EWN,13.93220339,59,New Bern
+CRW,13.87017544,285,Charleston
+GPT,13.86453577,657,Gulfport-Biloxi
+GTF,13.83333333,150,Great Falls
+PHF,13.82899628,538,Newport News
+ADK,13.71428571,7,Adak
+BET,13.50617284,81,Bethel
+CRP,13.4953271,535,Corpus Christi
+OME,13.25,88,Nome
+HLN,13.20786517,178,Helena
+PHX,13.2066901,15366,Phoenix
+LFT,13.16145833,384,Lafayette
+FLO,13.125,40,Florence
+SNA,12.94669913,3696,Santa Ana
+ROA,12.84179104,335,Roanoke
+RAP,12.79225352,284,Rapid City
+GJT,12.7218543,453,Grand Junction
+DFW,12.63962871,21439,Dallas-Fort Worth
+BIL,12.5147929,338,Billings
+ROW,12.48275862,87,Roswell
+SBP,12.35119048,336,San Luis Obispo
+BTR,12.19152276,637,Baton Rouge
+LWS,12.18644068,59,Lewiston
+ILM,12.1744186,258,Wilmington
+SGU,12.14919355,248,St George
+MOT,12.09302326,86,Minot
+MFE,12.07331378,341,McAllen
+DCA,12.06266786,6702,Arlington
+CMX,12.02941176,34,Hancock
+PNS,11.84848485,660,Pensacola
+CPR,11.72340426,188,Casper
+CDC,11.65454545,55,Cedar City
+LRD,11.65326633,199,Laredo
+TYR,11.64444444,90,Tyler
+DLH,11.62962963,108,Duluth
+TLH,11.50540541,370,Tallahassee
+SJT,11.41176471,17,San Angelo
+MYR,11.33742331,326,Myrtle Beach
+HNL,11.3060144,4722,Honolulu
+BFL,11.13409962,261,Bakersfield
+MEM,11.06519247,6105,Memphis
+OTZ,10.98876404,89,Kotzebue
+PSP,10.86538462,988,Palm Springs
+OGG,10.73260073,1638,Kahului
+CLL,10.7195122,82,College Station
+PSE,10.61666667,60,Ponce
+SBA,10.51048218,954,Santa Barbara
+MGM,10.42258065,310,Montgomery
+DRO,10.37410072,278,Durango
+ABI,10.22009569,209,Abilene
+EKO,10.05042017,119,Elko
+MRY,9.643274854,513,Monterey
+CHO,9.612244898,49,Charlottesville
+HTS,9.333333333,51,Huntington
+GNV,9.331460674,178,Gainesville
+GRK,9.18579235,183,Killeen
+COD,9.096385542,83,Cody
+FSM,9.055776892,251,Fort Smith
+LCH,9.035714286,56,Lake Charles
+KOA,8.843351548,1098,Kailua/Kona
+GGG,8.754098361,61,Longview
+ACT,8.568965517,116,Waco
+VLD,8.414634146,82,Valdosta
+LAW,8.345679012,81,Lawton
+CLT,8.011643079,9963,Charlotte
+TRI,7.78,200,Bristol
+LIH,7.567843866,1076,Lihue
+ITO,7.244285714,700,Hilo
+PIH,7.086956522,115,Pocatello
+FLG,6.120967742,124,Flagstaff
+SCC,5.275862069,58,Deadhorse
+YUM,2.633187773,229,Yuma
+SMX,2.359649123,114,Santa Maria
+CLD,2.173184358,179,NA
+OXR,0.653061224,98,Oxnard
+IPL,-0.2,55,Imperial
+IYK,-0.361111111,72,Inyokern
+ITH,-0.956521739,23,Ithaca
+</script>
+    <script>drawBarChart();</script>
+  </body>
+</html>
